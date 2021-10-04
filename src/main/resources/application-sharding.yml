@@ -1,0 +1,57 @@
+spring:
+  shardingsphere:
+    datasource:
+      names: "search-center,search-center-00,search-center-00-slave,search-center-01,search-center-01-slave"
+      search-center:
+        type: com.alibaba.druid.pool.DruidDataSource
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        url: jdbc:mysql://localhost:3306/search_center?useUnicode=true&characterEncoding=utf8&serverTimezone=UTC
+        username: root
+        password: 123456
+      search-center-00:
+        type: com.alibaba.druid.pool.DruidDataSource
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        url: jdbc:mysql://localhost:3306/search_center_00?useUnicode=true&characterEncoding=utf8&serverTimezone=UTC
+        username: root
+        password: 123456
+      search-center-00-slave:
+        type: com.alibaba.druid.pool.DruidDataSource
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        url: jdbc:mysql://localhost:3307/search_center_00?useUnicode=true&characterEncoding=utf8&serverTimezone=UTC
+        username: root
+        password: 123456
+      search-center-01:
+        type: com.alibaba.druid.pool.DruidDataSource
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        url: jdbc:mysql://localhost:3306/search_center_01?useUnicode=true&characterEncoding=utf8&serverTimezone=UTC
+        username: root
+        password: 123456
+      search-center-01-slave:
+        type: com.alibaba.druid.pool.DruidDataSource
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        url: jdbc:mysql://localhost:3307/search_center_01?useUnicode=true&characterEncoding=utf8&serverTimezone=UTC
+        username: root
+        password: 123456
+    sharding:
+      default-data-source-name: search-center
+      master-slave-rules:
+        search-center-00:
+          master-data-source-name: search-center-00
+          slave-data-source-names: search-center-00-slave
+        search-center-01:
+          master-data-source-name: search-center-01
+          slave-data-source-names: search-center-01-slave
+      tables:
+        user:
+          actual-data-nodes: search-center-$->{(0..1).collect{t ->t.toString().padLeft(2,'0')}}.user_$->{(0..1).collect{t ->t.toString().padLeft(2,'0')}}
+          database-strategy:
+            standard:
+              shardingColumn: id
+              precise-algorithm-class-name: com.gory.searchcenter.config.DatabaseAlgorithm
+          table-strategy:
+            standard:
+              sharding-column: id
+              precise-algorithm-class-name: com.gory.searchcenter.config.TableAlgorithm
+    props:
+      sql:
+        show: true

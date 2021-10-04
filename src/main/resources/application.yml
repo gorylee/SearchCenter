@@ -1,0 +1,11 @@
+spring:
+  profiles:
+    active: dev
+    include: sharding
+  application:
+    name: search-center
+  main:
+    allow-bean-definition-overriding: true
+
+server:
+  port: 8088
